@@ -6,7 +6,11 @@ A WhatsApp-inspired chat application built using **React, TypeScript, and Tailwi
 
 ## 🚀 Live Demo
 
+<<<<<<< HEAD
 👉 (Add your Vercel link here once deployed)
+=======
+👉 https://globalwechat.vercel.app/
+>>>>>>> c00ee63 (updated chat UI)
 
 ---
 
