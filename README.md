@@ -1,73 +1,108 @@
-# React + TypeScript + Vite
+# 💬 Global We Chat (WhatsApp Clone)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A WhatsApp-inspired chat application built using **React, TypeScript, and Tailwind CSS**, designed to showcase modern frontend development skills with dynamic UI and interactive chat features.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Live Demo
 
-## React Compiler
+👉 (Add your Vercel link here once deployed)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## ✨ Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+* 💬 Real-time chat UI simulation
+* 🤖 AI-powered smart replies (Gemini integration)
+* 📱 Fully responsive design (mobile + desktop)
+* 🔍 Chat search functionality
+* 🧠 Local storage for persistent chats
+* ⚡ Optimized performance with reusable components
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🛠️ Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+* **Frontend:** React.js, TypeScript
+* **Styling:** Tailwind CSS
+* **Build Tool:** Vite
+* **State Management:** React Context API
+* **AI Integration:** Gemini API
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+ ├── components/
+ ├── context/
+ ├── hooks/
+ ├── lib/
+ ├── data/
+ ├── utils/
+ └── types/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## ⚙️ Setup Instructions
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/piyushy-817/Global-We-Chat.git
+cd Global-We-Chat
 ```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Run the project
+
+```bash
+npm run dev
+```
+
+---
+
+## 🔐 Environment Variables
+
+Create a `.env` file and add:
+
+```
+VITE_GEMINI_API_KEY=your_api_key_here
+```
+
+---
+
+## 📸 Screenshots
+
+(Add screenshots here – very important for recruiters)
+
+---
+
+## 🎯 Purpose
+
+This project was built to demonstrate:
+
+* Component-based architecture
+* Type-safe development using TypeScript
+* Clean and scalable frontend structure
+* Integration of AI features in UI
+
+---
+
+## 🙌 Author
+
+**Piyush Yadav**
+Frontend Developer
+
+---
+
+## ⭐ If you like this project
+
+Give it a star on GitHub!
