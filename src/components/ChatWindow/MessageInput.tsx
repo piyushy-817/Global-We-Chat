@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import {
-  Smile, Paperclip, Mic, Send, X, Square,
+  Smile, Paperclip, Mic, Send, X, Square, Reply,
   Image, FileText
 } from 'lucide-react'
 import { useChat } from '../../context/ChatContext'
@@ -19,13 +19,13 @@ export default function MessageInput({ chatId }: Props) {
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [isRecording, setIsRecording] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
-  const { sendMessage, activeChat } = useChat()
+  const { sendMessage, activeChat, replyTarget, setReplyTarget, setTypingState } = useChat()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const photoInputRef = useRef<HTMLInputElement>(null)
   const documentInputRef = useRef<HTMLInputElement>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
-  const recordingTimerRef = useRef<number | null>(null)
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const isBlocked = activeChat?.id === chatId && !!activeChat.isBlocked
 
@@ -202,16 +202,22 @@ export default function MessageInput({ chatId }: Props) {
     }
   }
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmed = text.trim()
     if (!trimmed && !attachments.length) return
     if (isBlocked) return
-    sendMessage(chatId, trimmed, attachments.length ? attachments : undefined)
-    setText('')
-    setAttachments([])
-    setShowEmoji(false)
-    setShowAttach(false)
-    textareaRef.current?.focus()
+    try {
+      await sendMessage(chatId, trimmed, attachments.length ? attachments : undefined)
+      setText('')
+      setAttachments([])
+      setShowEmoji(false)
+      setShowAttach(false)
+      await setTypingState(chatId, false)
+      textareaRef.current?.focus()
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Message failed to send.'
+      alert(message)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -308,6 +314,16 @@ export default function MessageInput({ chatId }: Props) {
         </div>
       )}
 
+      {replyTarget && (
+        <div className="mb-2 bg-white rounded-lg border border-wa-divider p-2 flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-xs text-wa-teal font-medium flex items-center gap-1"><Reply size={12} /> Replying to</p>
+            <p className="text-sm text-wa-text-secondary truncate">{replyTarget.content || 'Attachment'}</p>
+          </div>
+          <button onClick={() => setReplyTarget(null)} className="p-1 rounded hover:bg-wa-hover"><X size={14} /></button>
+        </div>
+      )}
+
       {/* File previews */}
       {attachments.length > 0 && (
         <div className="mb-2 bg-white rounded-lg border border-wa-divider p-2">
@@ -381,7 +397,11 @@ export default function MessageInput({ chatId }: Props) {
             <textarea
               ref={textareaRef}
               value={text}
-              onChange={e => setText(e.target.value)}
+              onChange={async e => {
+                const next = e.target.value
+                setText(next)
+                await setTypingState(chatId, next.trim().length > 0)
+              }}
               onKeyDown={handleKeyDown}
               placeholder="Type a message"
               rows={1}

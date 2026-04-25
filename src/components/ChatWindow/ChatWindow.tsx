@@ -14,7 +14,7 @@ function getDateLabel(date: Date): string {
 }
 
 export default function ChatWindow() {
-  const { activeChat, deleteMessage, editMessage, clearMessages, setBlocked } = useChat()
+  const { activeChat, deleteMessage, editMessage, clearMessages, setBlocked, setReplyTarget, setReaction } = useChat()
   const bottomRef = useRef<HTMLDivElement>(null)
   const [highlightQuery, setHighlightQuery] = useState('')
   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null)
@@ -148,6 +148,8 @@ export default function ChatWindow() {
                 dividerLabel={showDivider ? getDateLabel(msg.timestamp) : undefined}
                 onDelete={(messageId) => deleteMessage(activeChat.id, messageId)}
                 onEdit={(messageId, newContent) => editMessage(activeChat.id, messageId, newContent)}
+                onReply={(message) => setReplyTarget(message)}
+                onReact={(messageId, emoji) => setReaction(activeChat.id, messageId, emoji)}
               />
             )
           })
@@ -156,6 +158,7 @@ export default function ChatWindow() {
         {activeChat.isTyping && (
           <div className="flex justify-start mb-2">
             <div className="bg-white message-in px-4 py-3 shadow-sm flex items-center gap-1">
+              <span className="text-xs text-wa-green mr-2">{activeChat.name} is typing</span>
               <span className="typing-dot w-2 h-2 bg-wa-text-secondary rounded-full inline-block" />
               <span className="typing-dot w-2 h-2 bg-wa-text-secondary rounded-full inline-block" />
               <span className="typing-dot w-2 h-2 bg-wa-text-secondary rounded-full inline-block" />

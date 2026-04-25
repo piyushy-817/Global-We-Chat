@@ -26,7 +26,7 @@
 
 Example:
 ```
-VITE_GEMINI_API_KEY=AIzaSyD_...your_key_here...
+VITE_GROQ_API_KEY=gsk_...your_key_here...
 ```
 
 ### Step 2: Install Dependencies

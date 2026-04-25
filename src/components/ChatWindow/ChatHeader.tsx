@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { MoreVertical, Phone, Search, Video, ArrowLeft, BellOff, Trash2, Ban, ChevronUp, ChevronDown } from 'lucide-react'
+import { formatDistanceToNow } from 'date-fns'
 import Avatar from '../shared/Avatar'
 import { Chat } from '../../types'
 
@@ -127,10 +128,12 @@ export default function ChatHeader({
                 {isBlocked
                   ? 'You have blocked this user'
                   : chat.isTyping
-                  ? <span className="text-wa-green">typing...</span>
+                  ? <span className="text-wa-green">{`${chat.name} is typing...`}</span>
                   : chat.isOnline
                   ? 'online'
-                  : 'click here for contact info'
+                  : chat.lastSeenAt
+                  ? `last seen ${formatDistanceToNow(chat.lastSeenAt, { addSuffix: true })}`
+                  : 'offline'
                 }
               </p>
             </>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Check, CheckCheck, Download, FileText, MoreVertical, Trash2, Edit, Play, Pause } from 'lucide-react'
+import { Check, CheckCheck, Download, FileText, MoreVertical, Trash2, Edit, Play, Pause, Reply, SmilePlus } from 'lucide-react'
 import { Message } from '../../types'
 import { formatMessageTime } from '../../utils/helpers'
 
@@ -11,6 +11,8 @@ interface Props {
   dividerLabel?: string
   onDelete?: (messageId: string) => void
   onEdit?: (messageId: string, newContent: string) => void
+  onReply?: (message: Message) => void
+  onReact?: (messageId: string, emoji: string) => void
 }
 
 function escapeRegExp(value: string) {
@@ -48,7 +50,9 @@ function TickIcon({ status }: { status: string }) {
   return <Check size={13} className="text-white/70" />
 }
 
-export default function MessageBubble({ message, highlightQuery, isHighlighted, showDateDivider, dividerLabel, onDelete, onEdit }: Props) {
+const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '🙏']
+
+export default function MessageBubble({ message, highlightQuery, isHighlighted, showDateDivider, dividerLabel, onDelete, onEdit, onReply, onReact }: Props) {
   const [showMenu, setShowMenu] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(message.content)
@@ -229,10 +233,10 @@ export default function MessageBubble({ message, highlightQuery, isHighlighted, 
                         {att.type === 'image' ? (
                           <div className="relative">
                             <img
-                              src={att.thumbnail || att.data}
+                              src={att.thumbnail || att.url || att.data}
                               alt={att.name}
                               className="h-32 w-32 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                              onClick={() => window.open(att.data)}
+                              onClick={() => window.open(att.url || att.data)}
                             />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
                               <Download size={20} className="text-white" />
@@ -245,7 +249,7 @@ export default function MessageBubble({ message, highlightQuery, isHighlighted, 
                               : 'bg-black/5 hover:bg-black/10'
                           }`}>
                             <button
-                              onClick={() => handlePlayAudio(att.data, att.id)}
+                              onClick={() => handlePlayAudio(att.url || att.data || '', att.id)}
                               className="flex-shrink-0 p-1.5 rounded-full bg-wa-teal text-white hover:opacity-90 transition-opacity"
                             >
                               {playingAudioId === att.id ? (
@@ -271,7 +275,7 @@ export default function MessageBubble({ message, highlightQuery, isHighlighted, 
                           </div>
                         ) : (
                           <button
-                            onClick={() => downloadFile(att.data, att.name)}
+                            onClick={() => downloadFile(att.url || att.data || '', att.name)}
                             className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${
                               message.isOutgoing
                                 ? 'bg-white/20 hover:bg-white/30'
@@ -289,6 +293,12 @@ export default function MessageBubble({ message, highlightQuery, isHighlighted, 
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {message.replyToSnippet && (
+                <div className="mx-3 mt-2 px-2 py-1 rounded border-l-2 border-wa-teal bg-black/5 text-xs text-wa-text-secondary">
+                  {message.replyToSnippet}
                 </div>
               )}
 
@@ -328,6 +338,16 @@ export default function MessageBubble({ message, highlightQuery, isHighlighted, 
                       )}
                       <button
                         onClick={() => {
+                          onReply?.(message)
+                          setShowMenu(false)
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 hover:bg-wa-hover text-wa-text-primary text-sm transition-colors text-left"
+                      >
+                        <Reply size={16} />
+                        Reply
+                      </button>
+                      <button
+                        onClick={() => {
                           setShowDeleteConfirm(true)
                           setShowMenu(false)
                         }}
@@ -365,6 +385,26 @@ export default function MessageBubble({ message, highlightQuery, isHighlighted, 
                       </button>
                     </div>
                   </div>
+                </div>
+              )}
+
+              <div className="px-3 pb-1 flex items-center gap-1">
+                <SmilePlus size={12} className="text-wa-text-secondary" />
+                {QUICK_REACTIONS.map(emoji => (
+                  <button
+                    key={emoji}
+                    onClick={() => onReact?.(message.id, emoji)}
+                    className="text-xs hover:scale-110 transition-transform"
+                    title={`React ${emoji}`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+
+              {message.reactions && Object.keys(message.reactions).length > 0 && (
+                <div className="px-3 pb-1 text-xs text-wa-text-secondary">
+                  {Object.values(message.reactions).join(' ')}
                 </div>
               )}
 

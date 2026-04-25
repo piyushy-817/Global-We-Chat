@@ -1,35 +1,50 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
-
-const apiKey = (import.meta as any).env.VITE_GEMINI_API_KEY as string
+const apiKey = (import.meta as any).env.VITE_GROQ_API_KEY as string
+const groqModel = (import.meta as any).env.VITE_GROQ_MODEL as string || 'llama-3.1-8b-instant'
 
 if (!apiKey) {
-  console.error('❌ Gemini API key not found! Add VITE_GEMINI_API_KEY to .env.local')
+  console.error('❌ Groq API key not found! Add VITE_GROQ_API_KEY to .env.local')
 } else {
-  console.log('✅ Gemini API key loaded successfully')
+  console.log('✅ Groq API key loaded successfully')
 }
 
-const genAI = new GoogleGenerativeAI(apiKey)
-
-// Configure model with higher temperature for varied responses
-export const geminiModel = genAI.getGenerativeModel({ 
-  model: 'gemini-1.5-flash',
-})
+interface TextResponse {
+  text: () => string
+}
 
 // Helper function to generate with specific temperature
 export async function generateWithTemperature(prompt: string, temperature: number = 0.9) {
   try {
-    const result = await geminiModel.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature,
-        topP: 0.95,
-        topK: 40,
-        maxOutputTokens: 200,
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        model: groqModel,
+        messages: [{ role: 'user', content: prompt }],
+        temperature,
+        top_p: 0.95,
+        max_tokens: 220,
+      }),
     })
-    return result.response
+
+    if (!response.ok) {
+      const errorBody = await response.text()
+      throw new Error(`Groq API ${response.status}: ${errorBody}`)
+    }
+
+    const data = await response.json() as {
+      choices?: Array<{ message?: { content?: string } }>
+    }
+    const content = data.choices?.[0]?.message?.content?.trim() || ''
+    const wrapped: TextResponse = {
+      text: () => content,
+    }
+
+    return wrapped
   } catch (error) {
-    console.error('API Error:', error)
+    console.error('Groq API Error:', error)
     throw error
   }
 }
